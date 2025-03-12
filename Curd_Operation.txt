@@ -1,0 +1,156 @@
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CrudOperationApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CrudOperationApplication.class, args);
+	}
+
+}
+////////////////////////////////////////////////////////////////////////
+package com.example.demo;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import net.bytebuddy.dynamic.DynamicType.Builder.FieldDefinition.Optional;
+
+@RestController
+public class MyController {
+	
+	@Autowired
+	StudentJPA jpa;
+	
+	@RequestMapping("add")
+	public void add()
+	{
+		Student s=new Student(2, "Gomya", 100);
+		
+		jpa.save(s);
+	}
+	
+	@RequestMapping("read")
+	public List<Student> read()
+	{
+	  List<Student> students = jpa.findAll();
+	  return students;
+	}
+	
+//	@RequestMapping("readone{id}")
+//	public Student read(@PathVariable int id)
+//	{
+//		Optional<Student> optionalObj = jpa.findById(id);
+//		if(optionalObj.isPresent())
+//		{
+//			Student student = optionalObj.get();
+//			return student;
+//		}
+//		return null;
+//	}
+
+	@RequestMapping("delete{id}")
+	public boolean delete(@PathVariable int id)
+	{
+		try
+		{
+			jpa.deleteById(id);
+			return true;
+		}
+		catch (Exception e) {
+			
+			return false;
+		}
+		
+	}
+ 
+}
+/////////////////////////////////////////////////////////////////////////
+package com.example.demo;
+
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+
+public class ServletInitializer extends SpringBootServletInitializer {
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(CrudOperationApplication.class);
+	}
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+package com.example.demo;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Student {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	int id;
+	String name;
+	int marks;
+
+	public Student(int id, String name, int marks) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.marks = marks;
+	}
+
+	public Student() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	@Override
+	public String toString() {
+		return "Student [id=" + id + ", name=" + name + ", marks=" + marks + "]";
+	}
+
+}
+
+////////////////////////////////////////////////////////////////////////////
+package com.example.demo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface StudentJPA extends JpaRepository<Student, Integer>{
+
+}

@@ -1,0 +1,497 @@
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:mysql://localhost:3306/project11
+spring.datasource.username=root
+spring.datasource.password=root
+spring.jpa.show-sql=true
+
+
+===========================================================
+==My Controller==
+package com.example.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@CrossOrigin
+public class MyController {
+	
+	@Autowired
+	UserRepo userrepo;
+	
+	@Autowired
+	TaskRepo taskrepo;
+	
+	@RequestMapping("changeStatus{taskId}and{newStatus}")
+	public boolean changeStatus(@PathVariable int taskId, @PathVariable int newStatus)
+	{
+		try
+		{
+			Task task=taskrepo.findById(taskId).get();
+			task.setStatus(newStatus);
+			taskrepo.save(task);
+			return true;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+	}
+	@RequestMapping("login/{username}/{password}")
+	public Object login(@PathVariable String username,@PathVariable String password)
+	{
+		try
+		{
+			if(userrepo.countByUsername(username)!=1)
+				return -1;
+			User user=userrepo.findByUsername(username);
+			if(!password.equals(user.getPassword()))
+				return -2;
+			return 1;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+	@RequestMapping("addTask{userId}and{work}")
+	public Task addTask(@PathVariable int userId, @PathVariable String work)
+	{
+		try
+		{
+			Task task=new Task(0, work, 0);
+			task=taskrepo.save(task);
+			User user=userrepo.findById(userId).get();
+			user.getTasks().add(task);
+			userrepo.save(user);
+			return task;
+		}
+		catch (Exception e) {
+			
+			e.printStackTrace();
+			return null;
+		}
+		}
+	@RequestMapping("userdata/{username}")
+	public User userdata(@PathVariable String username)
+	{
+		try {
+			return userrepo.findByUsername(username);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+			
+		}
+	}
+	{
+		
+	}
+
+}
+
+=========================================================================
+
+package com.example.demo;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Task {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	int id;
+	String work;
+	int status;  //0-Not Yet Started 1-Doing 2-done
+	@Override
+	public String toString() {
+		return "Task [id=" + id + ", work=" + work + ", status=" + status + "]";
+	}
+	public Task() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Task(int id, String work, int status) {
+		super();
+		this.id = id;
+		this.work = work;
+		this.status = status;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getWork() {
+		return work;
+	}
+	public void setWork(String work) {
+		this.work = work;
+	}
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+}
+
+
+
+================================================================================
+package com.example.demo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TaskRepo extends JpaRepository<Task, Integer> {
+
+}
+================================================================================
+
+package com.example.demo;
+
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+@Entity
+public class User {
+
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	int id;
+	String name;
+	String username;
+	String password;
+	
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", name=" + name + ", username=" + username + ", password=" + password + ", tasks="
+				+ tasks + "]";
+	}
+
+	public User() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public User(int id, String name, String username, String password, List<Task> tasks) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.username = username;
+		this.password = password;
+		this.tasks = tasks;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public List<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(List<Task> tasks) {
+		this.tasks = tasks;
+	}
+
+	@OneToMany
+	List<Task> tasks;
+
+}
+
+
+==============================================================================
+
+
+package com.example.demo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepo extends JpaRepository<User, Integer>{
+
+	
+	int countByUsername(String username);
+	User findByUsername(String username);
+}
+
+
+
+
+================================================================================================
+
+ANGULAR CODE
+
+
+
+//APP.COMPONENTTS
+
+import { Component } from '@angular/core';
+import { Student } from './student';
+import {HttpClient} from '@angular/common/http'
+import {User} from './user';
+import {Task} from './task';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  
+  allStudents:Student[]=[];
+  constructor(private http:HttpClient)
+  {
+
+  }
+  user: User = new User;
+
+  isLoggedIn:number=0;
+  username:string="";
+  password:string="";
+  errorMessage:string="";
+ // http://localhost:8080/login/
+  login()
+  {
+    let url="http://35.78.78.99:8080/OneToMany-0.0.1-SNAPSHOT/login/"+this.username+"/"+this.password;
+    this.http.get(url).subscribe(
+
+      (num:any)=>
+      {
+        if(num==-1)
+        this.errorMessage="Username wrong";
+        else if(num==-2)
+        this.errorMessage="Password wrong";
+        else if(num==0)
+        this.errorMessage="somthing wrong on server";
+        else if(num==1)
+        //http://localhost:8080/userdata/
+        {
+          let url2="http://35.78.78.99:8080/OneToMany-0.0.1-SNAPSHOT/userdata/"+this.username;
+          this.http.get(url2).subscribe(
+            (data:any)=>
+            {
+              if(data==null)
+              window.alert("Something is wrong");
+              else{
+                this.user=data;
+                this.isLoggedIn=1;
+              }
+            }
+          );
+        }
+        else
+        this.errorMessage="Contact Team Hefshine";
+      }
+    );
+  }
+  logout()
+  {
+    this.isLoggedIn=0;
+  }
+  getStatus(num:number)
+  {
+    if(num==0)
+    return "NotYetStarted";
+    else if(num==1)
+    return "Working";
+    return "Done";
+  }
+
+  work:string="";
+  addNewTask()
+  //http://localhost:8080/addTask
+  {
+    let url="http://35.78.78.99:8080/OneToMany-0.0.1-SNAPSHOT/addTask"+this.user.id+"and"+this.work;
+    this.http.get(url).subscribe(
+
+      (data:any)=>
+      {
+        if(data==null)
+        window.alert("Something wrong");
+        else
+        {
+          this.user.tasks.push(data);
+          this.work="";
+        }
+      }
+    );
+  }
+  changeStatus(task:Task,newStatus:number)
+ // http://localhost:8080/changeStatus
+  {
+    let url="http://35.78.78.99:8080/OneToMany-0.0.1-SNAPSHOT/changeStatus"+task.id+"and"+newStatus;
+    this.http.get(url).subscribe(
+
+      (data:any)=>
+      {
+        if(!data)
+        window.alert("Somthing is wrong");
+        else{
+          task.status=newStatus;
+        }
+      }
+    );
+  }
+
+
+    
+  }
+  
+  
+====================================================================================================
+    
+   
+//HTML
+
+
+<div *ngIf="isLoggedIn==0">
+  UserName:<input type="text" [(ngModel)]="username"><br>
+  Password:<input type="text" [(ngModel)]="password"><br>
+  <button (click)="login()">Login</button><br>
+  {{errorMessage}}
+  </div>
+  <div *ngIf="isLoggedIn==1">
+    <button (click)="logout()" >LogOut</button><br>
+    Welcome {{user.name}}<br><br>
+
+    <table border="1">
+      <tr>
+        <th>SN</th>
+        <th>Work</th>
+        <th>Status</th>
+        <th>Action</th>
+        </tr>
+
+        <tr *ngFor="let task of user.tasks,let i=index">
+          <td>{{i+1}}</td>
+          <td>{{task.work}}</td>
+          <td>{{getStatus(task.status)}}</td>
+          <td>
+            <button (click)="changeStatus(task,1)" >MarkasWorking</button>
+            <button (click)="changeStatus(task,2)" >MarkasDone</button>
+            </td>
+            </tr>
+            </table>
+            <br><br>
+
+            AddNewTask:<br>
+            <input tyep="text" [(ngModel)]="work">
+            <button (click)="addNewTask()" >Add</button>
+            </div>
+            
+==============================================================================================================
+
+//APP.MODULESTS
+
+
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import {HttpClientModule} from '@angular/common/http'
+
+import { AppComponent } from './app.component';
+import { FormsModule } from '@angular/forms';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule
+    
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+===================================================================================================================
+
+//STUDENT.TS
+
+
+export class Student {
+
+    roll:number=0;
+    name:string="";
+    marks:number=0;
+
+}
+=====================================================================================================================
+
+//TASK
+
+
+export class Task {
+    id:number=0;
+    work:string="";
+    status: number=0;
+
+}
+===========================================================================================================================
+
+
+//USER
+
+import { Task } from "./task";
+export class User {
+    id:number=0;
+    name:string="";
+    tasks: Task[]=[];
+}
+
+   
+
+
+
+
+
+
+
