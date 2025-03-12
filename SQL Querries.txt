@@ -1,0 +1,308 @@
+************Basic***********
+Q1. Write a query to display the names (first_name, last_name) using alias name “First Name", "Last Name". 
+--->select FIRST_NAME as First_Name, LAST_NAME as Last_Name from employees
+
+Q2. Write a query to get unique department ID from employee table.
+ --->select distinct DEPARTMENT_ID from employees
+
+Q3. Write a query to get the details of all employees according to first name in descending order.
+---> select * from employees order by FIRST_NAME desc    //Descending Order
+
+Q4. Write a query to get the employee ID, name (first_name, last_name), salary in ascending order of salary. 
+--->select EMPLOYEE_ID, FIRST_NAME,LAST_NAME,SALARY from employees order by SALARY
+ 
+Q5. Write a query to get the maximum and minimum salary from employees table
+--->select max(SALARY),min(SALARY) from employees
+
+Q6. Write a query to get the average salary and number of employees in the employees table.
+--->select avg(SALARY),count(*) from employees
+
+Q7. Write a query to get the number of employees working with the company.
+--->select count(*) from employees
+
+Q8. Write a query to get the number of designations available in the employees table. 
+---> select count(distinct JOB_ID) from employees
+
+Q9. Write a query get all first name from employees table in upper case.
+---> select upper(FIRST_NAME) from employees
+
+Q10. Write a query to get the first three characters of first name of all employees.
+---> select substr(FIRST_NAME,1,3) from employees
+
+Q11.  Write a query to calculate 171*214+625.
+---> 
+
+ **************Restricting and Sorting data****************
+
+Q1. Write a query to display the name (first_name, last_name) and salary for all employees whose 
+	salary is not in the range $10,000 through $15,000
+---> select FIRST_NAME, LAST_NAME,SALARY from employees where SALARY<10000 or SALARY>15000;
+---> select FIRST_NAME,LAST_NAME,SALARY from employees where SALARY not in(10000,15000)
+
+Q2. Write a query to display the name (first_name, last_name) and department ID of all employees in 
+	departments 30 or 100 in ascending order.
+---> select FIRST_NAME,LAST_NAME,DEPARTMENT_ID from employees 
+	where DEPARTMENT_ID in(30,100) order by DEPARTMENT_ID
+
+Q3. Write a query to display the name (first_name, last_name) and salary for all employees whose 
+salary is not in the range $10,000 through $15,000 and are in department 30 or 100
+---> select FIRST_NAME, LAST_NAME, SALARY from employees 
+	where (SALARY<10000 or SALARY>15000) and DEPARTMENT_ID in (30,100);
+--->select FIRST_NAME,LAST_NAME,SALARY from employees 
+where SALARY not in (10000, 15000) and DEPARTMENT_ID in(30,100)
+
+Q4. Write a query to display the name (first_name, last_name) and hire date for all employees who 
+	were hired in 1987
+--->select FIRST_NAME, LAST_NAME, HIRE_DATE from employees 
+	 where HIRE_DATE like '1987%'
+
+Q5. Write a query to display the first_name of all employees who have both "b" and "c" in their first name.
+--->select FIRST_NAME from employees
+	where FIRST_NAME like '%b%' and FIRST_NAME like '%c%';
+
+Q6. Write a query to display the last name, job, and salary for all employees whose job is that of a 
+	Programmer or a Shipping Clerk, and salary is not equal to $4,500, $10,000, or $15,000.
+---> select LAST_NAME,JOB_ID,SALARY from employees
+	where JOB_ID in ('IT_PROG','SH_CLERK')
+	and SALARY not in (4500,10000,15000);
+
+Q7. Write a query to display the last name of employees whose name have exactly 6 characters.
+---> select LAST_NAME from employees where length(LAST_NAME)=6;
+---> select LAST_NAME from employees where LAST_NAME like '______'
+
+Q8.  Write a query to display the last name of employees having 'e' as the third character.
+---> select LAST_NAME from employees 
+	where LAST_NAME like '__e%'
+
+Q9. Write a query to display the jobs/designations available in the employees table.
+---> select distinct JOB_ID from employees
+
+Q10. Write a query to display the name (first_name, last_name), salary and PF (15% of salary) of all 
+	employees.
+---> select FIRST_NAME,LAST_NAME,SALARY,SALARY*0.15 as PF from employees
+
+Q11. Write a query to select all record from employees where last name in 'BLAKE', 'SCOTT', 'KING' 
+	and 'FORD'.
+---> select * from employees where LAST_NAME in ('BLAKE','SCOTT','KING','FORD');
+
+
+	********************Aggregate Functions******************
+
+Q1.Write a query to list the number of jobs available in the employees table. 
+=>select count(distinct JOB_ID) from employees
+
+Q2. Write a query to get the total salaries payable to employees
+=>select sum(salary) from employees
+
+Q3. Write a query to get the minimum salary from employees table.
+=>select min(salary) from employees
+
+Q4.Write a query to get the maximum salary of an employee working as a Programmer.
+=> select max(salary) from employees where JOB_ID='IT_PROG'
+
+Q5. Write a query to get the average salary and number of employees working the department 90.
+=> select avg(salary) from employees where DEPARTMENT_ID=90
+
+Q6. Write a query to get the highest, lowest, sum, and average salary of all employees.
+=> select max(SALARY),min(SALARY),sum(SALARY),avg(SALARY) from employees
+
+Q7. Write a query to get the number of employees with the same job.
+=> select JOB_ID,count(*) from employees group by JOB_ID
+
+Q8. Write a query to get the difference between the highest and lowest salaries.
+=> select max(SALARY)-min(SALARY) from employees
+
+Q9. Write a query to find the manager ID and the salary of the lowest-paid employee for that manager
+=> select MANAGER_ID,min(SALARY) from employees group by MANAGER_ID
+=>select MANAGER_ID,min(salary) from employees
+	where MANAGER_ID!=0 group by MANAGER_ID order by min(SALARY)
+
+Q10. Write a query to get the department ID and the total salary payable in each department.
+=> select DEPARTMENT_ID,sum(SALARY) from employees group by DEPARTMENT_ID
+
+Q11. Write a query to get the average salary for each job ID excluding programmer
+=> select JOB_ID,avg(SALARY) from employees 
+	where JOB_ID <> 'IT_PROG'
+	group by JOB_ID;
+
+=> select JOB_ID,avg(SALARY) from employees 
+	group by JOB_ID
+	having JOB_ID <> 'IT_PROG'
+
+Q12.Write a query to get the total salary, maximum, minimum, average salary of employees
+=> select sum(salary),max(SALARY),min(SALARY),avg(SALARY) from employees
+
+Q13. Write a query to get the job ID and maximum salary of the employees where maximum salary is 
+	greater than or equal to $4000
+=> select JOB_ID, max(SALARY) from employees group by JOB_ID having max(SALARY)>=4000
+
+Q14. Write a query to get the average salary for all departments employing more than 10 employees
+=> select avg(SALARY),DEPARTMENT_ID from employees group by DEPARTMENT_ID having count(*)>10
+
+		**************SubQuery**************
+
+Q1. Write a query to find the name (first_name, last_name) and the salary of the employees who have 
+	a higher salary than the employee whose last_name='Bull'
+=>select FIRST_NAME,LAST_NAME,SALARY from employees
+	where SALARY>(select SALARY from employees where LAST_NAME='Bull')
+
+Q2. Write a query to find the name (first_name, last_name) of all employees who works in the IT department
+=> select FIRST_NAME,LAST_NAME from employees 
+	where DEPARTMENT_ID in 
+	(Select DEPARTMENT_ID from departments where DEPARTMENT_NAME like 'it%')
+=> select FIRST_NAME,LAST_NAME from employees 
+	where DEPARTMENT_ID in
+	(Select DEPARTMENT_ID from employees where JOB_ID like 'it%')
+
+Q3. Write a query to find the name (first_name, last_name) of the employees who have a manager and 
+	worked in a USA based department
+=> select FIRST_NAME,LAST_NAME from employees
+	where MANAGER_ID>0 and DEPARTMENT_ID in 
+	(SELECT DEPARTMENT_ID FROM departments
+	where LOCATION_ID in (SELECT LOCATION_ID FROM locations
+	where COUNTRY_ID='US'));
+
+Q4. Write a query to find the name (first_name, last_name) of the employees who are managers
+=> select FIRST_NAME,LAST_NAME from employees 
+	where EMPLOYEE_ID in (select MANAGER_ID from employees)
+
+Q5.Write a query to find the name (first_name, last_name), and salary of the employees whose salary 
+	is greater than the average salary
+=> select FIRST_NAME,LAST_NAME,SALARY from employees
+	where SALARY>(select avg(SALARY) from employees)
+
+Q6. Write a query to find the name (first_name, last_name), and salary of the employees whose salary 
+	is equal to the minimum salary for their job grade
+=> select e1.FIRST_NAME,e1.LAST_NAME,e1.SALARY from employees e1
+	where SALARY=
+	(
+	select min(SALARY) from employees e2 where e2.JOB_ID=e1.JOB_ID
+	) order by FIRST_NAME
+
+Q7. Write a query to find the name (first_name, last_name), and salary of the employees who earns 
+	more than the average salary and works in any of the IT departments
+=> select e1.FIRST_NAME,e1.LAST_NAME,e1.SALARY from employees e1
+	where SALARY>(select avg(SALARY) from employees)
+	and DEPARTMENT_ID in (SELECT DEPARTMENT_ID FROM departments where DEPARTMENT_NAME like 'it%')
+
+Q8. Write a query to find the name (first_name, last_name), and salary of the employees who earns 
+	more than the earning of Mr. Bell
+=> select FIRST_NAME,LAST_NAME,SALARY from employees
+	where SALARY>(select SALARY from employees where LAST_NAME='Bell')
+
+Q9. Write a query to find the name (first_name, last_name), and salary of the employees who earn the 
+	same salary as the minimum salary for all departments
+=> SELECT FIRST_NAME,LAST_NAME,salary,DEPARTMENT_ID FROM employees
+	where salary in(select min(SALARY) from employees group by DEPARTMENT_ID)
+
+Q10. Write a query to find the name (first_name, last_name) and salary of the employees who earn a 
+	salary that is higher than the salary of all the Shipping Clerk (JOB_ID = 'SH_CLERK'). Sort the 
+	results of the salary of the lowest to highest.
+=>select FIRST_NAME,LAST_NAME,salary from employees
+	where SALARY>(select max(SALARY) from employees where JOB_ID='SH_CLERK') order by salary
+
+Q11. Write a query to find the name (first_name, last_name) of the employees who are not Programmer
+=> select FIRST_NAME,LAST_NAME from employees
+	where JOB_ID!='IT_PROG'
+
+Q12. Write a query to display the employee ID, first name, last name, and department names of all employees
+=> select EMPLOYEE_ID, FIRST_NAME,LAST_NAME,
+	(SELECT DEPARTMENT_NAME FROM departments d where d.DEPARTMENT_ID=e.DEPARTMENT_ID ) from employees e
+
+Q13. Write a query to display the employee ID, first name, last name, salary of all employees whose 
+	salary is above average for their departments.
+=> select e.EMPLOYEE_ID,e.FIRST_NAME,e.LAST_NAME,e.salary,e.DEPARTMENT_ID from employees e
+where SALARY>(select avg(SALARY) from employees e1 where e1.DEPARTMENT_ID=e.DEPARTMENT_ID)
+
+Q14. Write a query to fetch even numbered records from employees table
+=> select * from employees where EMPLOYEE_ID%2=0
+
+Q15.  Write a query to find the 5th maximum salary in the employees table
+=> select distinct salary from employees order by salary desc limit 4,1
+
+Q16. Write a query to find the 4th minimum salary in the employees table
+=> select distinct salary from employees order by salary limit 3,1
+
+Q17.  Write a query to select last 10 records from a table
+=> select * from employees order by EMPLOYEE_ID desc limit 0,10
+
+Q18. Write a query to list the department ID and name of all the departments where no employee is working
+=> SELECT DEPARTMENT_ID,DEPARTMENT_NAME FROM departments 
+	WHERE department_id NOT IN (select department_id FROM employees);
+
+Q19. Write a query to get 3 maximum salaries
+=> select distinct salary from employees order by salary desc limit 0,3
+
+Q20. Write a query to get 3 minimum salaries
+=> select distinct salary from employees order by salary limit 0,3
+
+
+*****************SQL JOINS*****************
+Q1. Write a query to find the addresses (location_id, street_address, city, state_province, 
+	country_name) of all the departments
+=> select LOCATION_ID, STREET_ADDRESS, CITY, STATE_PROVINCE, 
+	COUNTRY_NAME FROM locations join countries on LOCATION_ID
+
+Q2. Write a query to find the name (first_name, last name), department ID and department name of all 
+	the employees
+=> select FIRST_NAME,LAST_NAME,DEPARTMENT_ID,DEPARTMENT_NAME FROM employees 
+	JOIN departments USING (department_id);
+
+Q3. Write a query to find the name (first_name, last_name), job, department ID and name of the 
+	employees who works in London
+=> select FIRST_NAME,LAST_NAME,JOB_ID,DEPARTMENT_ID,DEPARTMENT_NAME from employees 
+	join departments using (department_id) join locations using (LOCATION_ID)
+	 where city='london'
+
+Q4. Write a query to find the employee id, name (last_name) along with their manager_id and name (last_name)
+=> SELECT e.EMPLOYEE_ID, e.LAST_NAME,m.MANAGER_ID,m.LAST_NAME FROM employees e
+	join employees m on (e.MANAGER_ID=m.EMPLOYEE_ID)
+
+Q5. Write a query to find the name (first_name, last_name) and hire date of the employees who was 
+	hired after 'Jones'
+=> select e.FIRST_NAME,e.LAST_NAME,e.HIRE_DATE from employees e 
+	join employees e2 on (e2.LAST_NAME='Jones') 
+	where e2.HIRE_DATE<e.HIRE_DATE
+
+Q6.  Write a query to get the department name and number of employees in the department.
+=> select DEPARTMENT_NAME,count(*) from employees
+	join departments using (department_id) group by DEPARTMENT_ID order by DEPARTMENT_NAME;
+
+Q7. Write a query to find the employee ID, job title, number of days between ending date and starting 
+	date for all jobs in department 90
+=> SELECT EMPLOYEE_ID,JOB_TITLE,END_DATE-START_DATE FROM job_history
+	join jobs using (job_id) where DEPARTMENT_ID='90'
+
+Q8.  Write a query to display the department ID and name and first name of manager
+=> SELECT d.DEPARTMENT_ID,d.DEPARTMENT_NAME,e.FIRST_NAME FROM departments d
+	join employees e
+	on d.MANAGER_ID=e.EMPLOYEE_ID
+
+Q9. Write a query to display the department name, manager name, and city
+=> SELECT d.DEPARTMENT_NAME,e.FIRST_NAME,l.city FROM departments d
+	join employees e on (d.MANAGER_ID=e.EMPLOYEE_ID)
+	join locations l using (location_id)
+
+Q10. Write a query to display the job title and average salary of employees
+=> SELECT JOB_TITLE,avg(salary) FROM jobs
+	join employees using (job_id) group by job_title;
+
+=> SELECT job_title, AVG(salary) FROM employees 
+	NATURAL JOIN jobs GROUP BY job_title;
+
+Q11. Write a query to display job title, employee name, and the difference between salary of the 
+	employee and minimum salary for the job
+=> SELECT JOB_TITLE,FIRST_NAME,SALARY-MIN_SALARY FROM employees
+	join jobs using (job_id)
+
+Q12. Write a query to display the job history that were done by any employee who is currently drawing 
+	more than 10000 of salary
+=> SELECT j.* FROM newschema.job_history j
+	join employees e on (e.EMPLOYEE_ID=j.EMPLOYEE_ID)
+	where salary>10000
+
+Q13. Write a query to display department name, Department Manager (first_name, last_name), hire date
+	of manager, salary of the manager for those managers whose experience is more than 15 years
+=> select d.DEPARTMENT_NAME,e.FIRST_NAME,e.LAST_NAME,e.HIRE_DATE,e.SALARY,(datediff(now(),hire_date))/365 Experience from employees e
+	join departments d on (d.MANAGER_ID=e.EMPLOYEE_ID)
+	where (datediff(now(),hire_date))/365>15
